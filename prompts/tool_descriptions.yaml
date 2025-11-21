@@ -1,0 +1,28 @@
+# Tool descriptions for the agent
+# DEVELOPER ZONE: Add your custom tools here
+
+tools:
+  snowflake_query:
+    name: "snowflake_query"
+    description: |
+      Execute predefined Snowflake queries to fetch business data.
+      
+      Available query types:
+      - Coverage gap analysis
+      - SLA compliance metrics
+      - Device validation
+      - Site mapping
+      
+      Usage: Specify query_id and required parameters
+    
+  file_operations:
+    name: "file_operations"
+    description: |
+      Perform file operations (upload, download, list, delete).
+      All operations are user-scoped for security.
+      
+      Actions:
+      - upload: Upload a file
+      - download: Download a file
+      - list: List user's files
+      - delete: Delete a file
