@@ -22,9 +22,9 @@ router = APIRouter(prefix="/files", tags=["Files"])
 
 @router.post("/upload", response_model=FileUploadResponse)
 async def upload_file(
+    user: UserContextDep,
     file: UploadFile = File(...),
     category: Optional[str] = Query(None, description="File category"),
-    user: UserContextDep = Depends(),
 ):
     """
     Upload file to S3-compatible storage.
@@ -55,7 +55,7 @@ async def upload_file(
 @router.get("/download/{file_id:path}")
 async def download_file(
     file_id: str,
-    user: UserContextDep = Depends(),
+    user: UserContextDep,
 ):
     """
     Download file from storage.
@@ -92,8 +92,8 @@ async def download_file(
 
 @router.get("/list", response_model=FileListResponse)
 async def list_files(
+    user: UserContextDep,
     category: Optional[str] = Query(None),
-    user: UserContextDep = Depends(),
 ):
     """
     List user's files.
@@ -117,7 +117,7 @@ async def list_files(
 @router.delete("/{file_id:path}")
 async def delete_file(
     file_id: str,
-    user: UserContextDep = Depends(),
+    user: UserContextDep,
 ):
     """
     Delete a file.
@@ -138,8 +138,8 @@ async def delete_file(
 @router.get("/url/{file_id:path}", response_model=FileDownloadURLResponse)
 async def generate_download_url(
     file_id: str,
+    user: UserContextDep,
     expiration: int = Query(3600, description="URL expiration in seconds"),
-    user: UserContextDep = Depends(),
 ):
     """
     Generate temporary download URL.
