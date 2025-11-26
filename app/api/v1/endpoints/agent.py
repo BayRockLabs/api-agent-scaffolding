@@ -23,7 +23,7 @@ async def agent_chat(
     request: ChatRequest,
     user: UserContextDep,
 ):
-    """"""
+    """
     Non-streaming agent chat interaction.
 
     - Natural language input

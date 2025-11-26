@@ -43,7 +43,7 @@ def validate_user_context(
     email: Optional[str],
     role: Optional[str] = None,
 ) -> UserContext:
-    """"""
+    """
     Validate and create user context from headers.
 
     Raises:
