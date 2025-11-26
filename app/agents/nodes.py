@@ -4,10 +4,11 @@ This is CORE INFRASTRUCTURE - Do not modify.
 """
 
 from langchain_core.messages import HumanMessage, AIMessage
-from typing import Dict, Any
+from typing import Dict, Any, List
 import structlog
 
 from app.agents.state import AgentState
+from app.services import llm_service
 
 logger = structlog.get_logger()
 
@@ -28,12 +29,48 @@ def planning_node(state: AgentState) -> Dict[str, Any]:
     }
 
 
-def query_execution_node(state: AgentState) -> Dict[str, Any]:
+async def query_execution_node(state: AgentState) -> Dict[str, Any]:
     """
     Query execution node - execute tools based on plan.
     Tool selection happens here.
     """
     logger.info("Agent: Query execution", user_id=state["user_id"])
+
+    # Prepare messages for LLM provider
+    llm_messages: List[Dict[str, str]] = []
+    for msg in state.get("messages", []):
+        if isinstance(msg, HumanMessage):
+            role = "user"
+        elif isinstance(msg, AIMessage):
+            role = "assistant"
+        else:
+            role = getattr(msg, "type", "assistant")
+
+        llm_messages.append({
+            "role": role,
+            "content": getattr(msg, "content", ""),
+        })
+
+    # Call LLM service (non-streaming) to get assistant response
+    response = await llm_service.chat_completion(messages=llm_messages)
+
+    # Extract assistant content from provider response
+    assistant_content = ""
+    try:
+        choices = response.get("choices", [])
+        if choices:
+            message = choices[0].get("message") or {}
+            assistant_content = message.get("content", "") or message.get("text", "")
+    except Exception:
+        assistant_content = ""
+
+    if assistant_content:
+        state_messages = list(state.get("messages", []))
+        state_messages.append(AIMessage(content=assistant_content))
+        return {
+            "messages": state_messages,
+            "current_step": "validate",
+        }
 
     return {
         "current_step": "validate",
