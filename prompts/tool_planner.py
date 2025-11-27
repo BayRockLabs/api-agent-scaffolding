@@ -14,11 +14,11 @@ Respond with a single JSON object, and nothing else. The JSON must have:
 - "arguments": JSON object with arguments for the tool (or empty object).
 
 Example response:
-{
+{{
   "tool": "my_tool",
   "reason": "User asked for a sales report",
-  "arguments": {"region": "EMEA", "year": 2024}
-}
+  "arguments": {{"region": "EMEA", "year": 2024}}
+}}
 """.strip()
 
 
