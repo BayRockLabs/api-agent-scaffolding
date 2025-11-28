@@ -66,7 +66,8 @@ async def copilotkit_action(
         # Developers can extend with custom actions
 
         if request.action == "chat":
-            # Handle chat action through agent (non-streaming)
+            # Handle chat action through agent (non-streaming).
+            # Multi-turn memory is handled by LangGraph checkpointer via thread_id.
             params = request.parameters or {}
             message_text = params.get("message", "")
 
@@ -156,9 +157,17 @@ async def copilotkit_stream(
             params = request.parameters or {}
             message_text = params.get("message", "")
 
+            thread_id = request.thread_id or f"thread_{user.user_id}"
+
+            messages_history = await _build_message_history(
+                thread_id=thread_id,
+                user=user,
+                latest_user_message=message_text,
+            )
+
             initial_state: AgentState = {
-                "messages": [HumanMessage(content=message_text)],
-                "thread_id": request.thread_id or f"thread_{user.user_id}",
+                "messages": messages_history,
+                "thread_id": thread_id,
                 "user_id": user.user_id,
                 "user_email": user.email,
                 "user_role": user.role,
