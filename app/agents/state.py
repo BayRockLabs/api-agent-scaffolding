@@ -4,7 +4,9 @@ This is CORE INFRASTRUCTURE - Do not modify.
 """
 
 from typing import TypedDict, List, Optional, Dict, Any
+from typing_extensions import Annotated
 from langchain_core.messages import BaseMessage
+from langgraph.graph import add_messages
 
 
 class AgentState(TypedDict):
@@ -14,7 +16,7 @@ class AgentState(TypedDict):
     """
 
     # Conversation
-    messages: List[BaseMessage]
+    messages: Annotated[List[BaseMessage], add_messages]
     thread_id: str
 
     # User Context (injected from headers)
